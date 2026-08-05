@@ -96,9 +96,13 @@ class map
 
             for(let i=0;i<this.map_max_x;i++)
             {
+                if(this.pixel_map[j][i].needs_screen_uptdate)
+            {
                 ctx.fillStyle = this.pixel_map[j][i].colour;
                 ctx.fillRect(i, j, 1, 1);
-                console.log(this.pixel_map[j][i].colour)
+                //console.log(this.pixel_map[j][i].colour)
+            }
+
             }
         }
     }
@@ -120,10 +124,10 @@ class map
 let current_operations=0;
 let big_map = new map(max_y,max_x,canvas)
 
-big_map.show_map_all()
-big_map.show_map_canvas()
+// big_map.show_map_all()
+// big_map.show_map_canvas()
 
-console.log("idk")
+console.log("we're starting")
 
 
 //ai made, change

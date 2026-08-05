@@ -44,8 +44,10 @@ function pixel_fall(id_map,pixel_map,p_y,p_x)
             if(pixel_map[p_y+1][p_x].weight < pixel.weight )//&& pixel_map[p_y+1][p_x].can_move==true)
             {
                 pixel_map[p_y][p_x]=pixel_map[p_y+1][p_x];
+                pixel_map[p_y][p_x].needs_screen_uptdate=true;
                 id_map[p_y][p_x]=pixel_map[p_y+1][p_x].id;
                 pixel_map[p_y+1][p_x]=pixel;
+                pixel_map[p_y+1][p_x].needs_screen_uptdate=true;
                 id_map[p_y+1][p_x]=pixel.id;
                 return;
             }
@@ -56,20 +58,24 @@ function pixel_fall(id_map,pixel_map,p_y,p_x)
             if(pixel_map[p_y+1][p_x+1].weight<pixel.weight )//&& pixel_map[p_y+1][p_x+1].can_move==true)
             {
                 pixel_map[p_y][p_x]=pixel_map[p_y+1][p_x+1];
+                pixel_map[p_y][p_x].needs_screen_uptdate=true;
                 id_map[p_y][p_x]=pixel_map[p_y+1][p_x+1].id;
                 pixel_map[p_y+1][p_x+1]=pixel;
+                pixel_map[p_y+1][p_x+1].needs_screen_uptdate=true;
                 id_map[p_y+1][p_x+1]=pixel.id;
                 return;
             }
         }
 
-        if(p_y+1<max_y && p_x-1>0)
+        if(p_y+1<max_y && p_x-1>=0)
         {
             if(pixel_map[p_y+1][p_x-1].weight<pixel.weight )//&& pixel_map[p_y+1][p_x-1].can_move==true)
             {
                 pixel_map[p_y][p_x]=pixel_map[p_y+1][p_x-1];
                 id_map[p_y][p_x]=pixel_map[p_y+1][p_x-1].id;
+                pixel_map[p_y][p_x].needs_screen_uptdate=true;
                 pixel_map[p_y+1][p_x-1]=pixel;
+                pixel_map[p_y+1][p_x-1].needs_screen_uptdate=true;
                 id_map[p_y+1][p_x-1]=pixel.id;
                 return;
             }
