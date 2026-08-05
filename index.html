@@ -1,0 +1,173 @@
+<html>
+<head>
+
+    <script src="functions.js"></script>
+    <script src="classes.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div id="powder_box">
+
+    <canvas id="canvas"></canvas>
+
+<div id="toolbar">
+
+    <button id="pause">pause</button>
+    <button id="air">air</button>
+    <button id="barrier">barrier</button>
+    <button id="sand">sand</button>
+    
+</div>
+
+</div>
+
+</body>
+<script>
+
+const pause_button = document.getElementById("pause");
+const air_button = document.getElementById("air");
+const barrier_button = document.getElementById("barrier");
+const sand_button = document.getElementById("sand");
+
+//size
+const max_x=20;
+const max_y=40;
+
+const scale = 20;
+
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = max_x;
+canvas.height = max_y;
+
+canvas.style.width = `${max_x * scale}px`;
+canvas.style.height = `${max_y * scale}px`;
+
+ctx.colour= "red"
+ctx.fillRect(1, 1, 1, 1);  
+
+class map
+{
+    constructor(max_y,max_x,canvas)
+    {
+        this.id_map=[];
+        this.id_map=make_id_map(this.id_map,max_y,max_x)
+
+        this.pixel_map=[];
+        this.pixel_map=make_pixel_map(this.pixel_map,max_y,max_x)
+
+        this.map_max_y=max_y;
+        this.map_max_x=max_x;
+
+        this.canvas=canvas;
+    }
+
+    set_pixel(pixel_id,pixel_y,pixel_x)
+    {
+        this.id_map[pixel_y][pixel_x]=pixel_id;
+        this.pixel_map[pixel_y][pixel_x]=pixels[pixel_id];
+    }
+
+    show_map_pixel(pixel_y,pixel_x)
+    {
+        console.log(this.id_map[pixel_y][pixel_x])
+        console.log(this.pixel_map[pixel_y][pixel_x].id)
+    }
+
+    show_map_all() 
+    {
+        console.log("show_map_all called");
+        console.log("id map");
+        for(let j=0;j<this.map_max_y;j++)
+        console.table(this.id_map[j])
+        //console.log("pixel_map");
+        //for(let j=0;j<this.map_max_y;j++)
+        //console.table(this.pixel_map[j])
+    }
+
+    show_map_canvas()
+    {
+        console.log("show_map_canvas called");
+        for(let j=0;j<this.map_max_y;j++)
+        {
+
+            for(let i=0;i<this.map_max_x;i++)
+            {
+                ctx.fillStyle = this.pixel_map[j][i].colour;
+                ctx.fillRect(i, j, 1, 1);
+                console.log(this.pixel_map[j][i].colour)
+            }
+        }
+    }
+
+    uptdate_pixels()
+    {
+        for(let j=this.map_max_y-1;j>=0;j--)
+        {
+
+            for(let i=0;i<this.map_max_x;i++)
+            {
+
+                pixel_fall(this.id_map,this.pixel_map,j,i);
+            }
+        }
+    }
+}
+
+let current_operations=0;
+let big_map = new map(max_y,max_x,canvas)
+
+big_map.show_map_all()
+big_map.show_map_canvas()
+
+console.log("idk")
+
+
+//ai made, change
+const FPS = 25;
+const FRAME_TIME = 1000 / FPS;
+
+let lastUpdate = 0;
+
+function frame_manager(time) {
+    if (time - lastUpdate >= FRAME_TIME) 
+    {
+        lastUpdate = time;
+
+        big_map.uptdate_pixels()
+        big_map.show_map_canvas()
+        
+    }
+
+    requestAnimationFrame(frame_manager);
+}
+
+requestAnimationFrame(frame_manager);
+
+
+//test
+let selected_item =2; //sand
+
+canvas.addEventListener("click", (event) => {
+
+    const rect = canvas.getBoundingClientRect();
+
+    const mouse_x = Math.floor((event.clientX - rect.left)/scale);
+    const mouse_y = Math.floor((event.clientY - rect.top)/scale);
+
+    big_map.set_pixel(selected_item,mouse_y,mouse_x);
+    big_map.show_map_canvas();
+
+    console.log(mouse_x, mouse_y);
+
+
+});
+</script>
+
+
+
+
+</html>

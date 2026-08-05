@@ -1,0 +1,50 @@
+canvas 
+{
+    image-rendering: pixelated;
+    background: #727272;
+}
+
+body 
+{
+    display: flex;
+    justify-content: center; /* horizontal */
+    align-items: center;     /* vertical */
+    background: #333;
+}
+
+/*for buttons */
+#toolbar 
+{
+    display: flex;
+    gap: 5px;
+
+    padding: 5px;
+
+    background: #444;
+    border-radius: 5px;
+}
+
+button 
+{
+
+    padding: 10px 20px;
+    font-size: 18px;
+
+    background: #555;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+    touch-action: manipulation;
+}
+/* button states */
+button:hover 
+{
+    background: #777;
+}
+button:active 
+{
+    background: #333;
+}
