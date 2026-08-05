@@ -2,6 +2,7 @@ canvas
 {
     image-rendering: pixelated;
     background: #727272;
+        touch-action: manipulation;
 }
 
 body 
