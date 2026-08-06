@@ -3,6 +3,7 @@
 
     <script src="functions.js"></script>
     <script src="classes.js"></script>
+    <script src="events.js"></script>
     <script src="map_functions.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -14,10 +15,10 @@
 
 <div id="toolbar">
 
-    <button id="pause" element_id = "-1">pause</button>
-    <button id="air" element_id = "0">air</button>
-    <button id="barrier" element_id = "1">barrier</button>
-    <button id="sand" element_id = "2">sand</button>
+    <button class="toggle" id="pause" data-element-id = "-1">pause</button>
+    <button class="tool" id="air" data-element-id = "0">air</button>
+    <button class="tool" id="barrier" data-element-id = "1">barrier</button>
+    <button class="tool" id="sand" data-element-id = "2">sand</button>
     
 </div>
 
@@ -140,6 +141,15 @@ game_paused=!game_paused;
 console.log(game_paused);
 });
 
+const buttons = document.querySelectorAll(".tool");
+
+//the pixel selector
+buttons.forEach(btn => {
+  btn.addEventListener("click", function() {
+    console.log("Selected tool:", btn.dataset.elementId);
+    selected_item=parseFloat(btn.dataset.elementId);
+  });
+});
 
 </script>
 

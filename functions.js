@@ -62,11 +62,8 @@ function pixel_fall(id_map,update_map,p_y,p_x)
 {
 
     let pixel = pixels[id_map[p_y][p_x]];
-    if(pixel.weight==undefined)
-    {
-        console.log("WTF")
-    }
-    else
+    let max_horizontal_slide=pixel.max_horizontal_slide;
+    let max_vertical_diffrence=pixel.max_vertical_diffrence;
     if(pixel.can_fall==true)
     {
         if(p_y+1<max_y)
