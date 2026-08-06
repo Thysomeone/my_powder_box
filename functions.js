@@ -18,18 +18,43 @@ function  show_map_canvas(map)
 
             }
         }
+
+
     }
 
 function update_pixels(id_map,uptdate_map)
     {
+        let x_pitty = 0;
+        //pitty sistem for the checks
+        //added to make it look more natural
+        //and to avoid anomalies
         for(let j=max_y-1;j>=0;j--)
         {
-
+            let random_side = Math.random(); //checks from random side
+            //this makes behvoir look more natural
+            if(random_side>=0.5 || x_pitty > x_pitty_chance)
+            {
             for(let i=0;i<max_x;i++)
             {
                 pixel_fall(id_map,uptdate_map,j,i);
             }
+
+            x_pitty--;
+            //decrease pitty
+            }
+            
+            if(random_side<0.5 || x_pitty < -x_pitty_chance)
+            {
+                for(let i=max_x-1;i>=0;i--)
+            {
+                pixel_fall(id_map,uptdate_map,j,i);
+            }
+
+            x_pitty++; //increase pitty
+            }
+
         }
+
     }
 
 function update_screen(id_map,uptdate_map)
@@ -182,5 +207,6 @@ function pixel_fall(id_map,update_map,p_y,p_x)
                 break;
         }
     }
+
 
 }

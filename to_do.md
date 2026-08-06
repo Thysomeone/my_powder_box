@@ -11,5 +11,8 @@ performance goal
 -more elements
 
 Optional / low priority
+
 -add combinations/element interactions
 --add temperature and fire
+
+-update pixels.md

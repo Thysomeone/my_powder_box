@@ -37,3 +37,6 @@ let water = new pixel(4,"#055fcc",5,true,true,10,1)
 const pixels =[gas_void,solid_barrier,air,sand,water];
 
 const added_pixel_amount = 5;
+
+const x_pitty_chance = 1;
+//how much the pitty can be before it's forced back down, for X axis

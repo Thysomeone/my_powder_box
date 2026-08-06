@@ -6,4 +6,3 @@ Special
 
 Normal materials
 2 - sand
-3 - stone
