@@ -3,6 +3,7 @@
 
     <script src="functions.js"></script>
     <script src="classes.js"></script>
+    <script src="map_functions.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,10 +14,10 @@
 
 <div id="toolbar">
 
-    <button id="pause">pause</button>
-    <button id="air">air</button>
-    <button id="barrier">barrier</button>
-    <button id="sand">sand</button>
+    <button id="pause" element_id = "-1">pause</button>
+    <button id="air" element_id = "0">air</button>
+    <button id="barrier" element_id = "1">barrier</button>
+    <button id="sand" element_id = "2">sand</button>
     
 </div>
 
@@ -46,92 +47,24 @@ canvas.height = max_y;
 canvas.style.width = `${max_x * scale}px`;
 canvas.style.height = `${max_y * scale}px`;
 
-ctx.colour= "red"
-ctx.fillRect(1, 1, 1, 1);  
+// ctx.fillStyle = "red"
+// ctx.fillRect(1, 1, 1, 1);  
 
-class map
-{
-    constructor(max_y,max_x,canvas)
-    {
-        this.id_map=[];
-        this.id_map=make_id_map(this.id_map,max_y,max_x)
-
-        this.pixel_map=[];
-        this.pixel_map=make_pixel_map(this.pixel_map,max_y,max_x)
-
-        this.map_max_y=max_y;
-        this.map_max_x=max_x;
-
-        this.canvas=canvas;
-    }
-
-    set_pixel(pixel_id,pixel_y,pixel_x)
-    {
-        this.id_map[pixel_y][pixel_x]=pixel_id;
-        this.pixel_map[pixel_y][pixel_x]=pixels[pixel_id];
-    }
-
-    show_map_pixel(pixel_y,pixel_x)
-    {
-        console.log(this.id_map[pixel_y][pixel_x])
-        console.log(this.pixel_map[pixel_y][pixel_x].id)
-    }
-
-    show_map_all() 
-    {
-        console.log("show_map_all called");
-        console.log("id map");
-        for(let j=0;j<this.map_max_y;j++)
-        console.table(this.id_map[j])
-        //console.log("pixel_map");
-        //for(let j=0;j<this.map_max_y;j++)
-        //console.table(this.pixel_map[j])
-    }
-
-    show_map_canvas()
-    {
-        console.log("show_map_canvas called");
-        for(let j=0;j<this.map_max_y;j++)
-        {
-
-            for(let i=0;i<this.map_max_x;i++)
-            {
-                if(this.pixel_map[j][i].needs_screen_uptdate)
-            {
-                ctx.fillStyle = this.pixel_map[j][i].colour;
-                ctx.fillRect(i, j, 1, 1);
-                //console.log(this.pixel_map[j][i].colour)
-            }
-
-            }
-        }
-    }
-
-    uptdate_pixels()
-    {
-        for(let j=this.map_max_y-1;j>=0;j--)
-        {
-
-            for(let i=0;i<this.map_max_x;i++)
-            {
-
-                pixel_fall(this.id_map,this.pixel_map,j,i);
-            }
-        }
-    }
-}
 
 let current_operations=0;
-let big_map = new map(max_y,max_x,canvas)
+
+let id_map=[];
+initalize_map(id_map,0);
+
+let update_map=[];
+initalize_map(update_map,0);
 
 // big_map.show_map_all()
 // big_map.show_map_canvas()
 
 console.log("we're starting")
-
-
 //ai made, change
-const FPS = 25;
+const FPS = 30;
 const FRAME_TIME = 1000 / FPS;
 
 let lastUpdate = 0;
@@ -140,12 +73,14 @@ function frame_manager(time) {
     if (time - lastUpdate >= FRAME_TIME) 
     {
         lastUpdate = time;
+        if(game_paused==false)
+    {
 
-        big_map.uptdate_pixels()
-        big_map.show_map_canvas()
-        
+        update_pixels(id_map,update_map);
+        update_screen(id_map,update_map);
     }
 
+    }
     requestAnimationFrame(frame_manager);
 }
 
@@ -154,6 +89,35 @@ requestAnimationFrame(frame_manager);
 
 //test
 let selected_item =2; //sand
+let place=false;
+canvas.addEventListener("mousedown", (event) =>
+{
+place=true;
+});
+
+canvas.addEventListener("mouseup", (event) =>
+{
+place=false;
+});
+
+canvas.addEventListener("mousemove", (event) => {
+
+    if(place==true)
+{
+
+    const rect = canvas.getBoundingClientRect();
+
+    const mouse_x = Math.floor((event.clientX - rect.left)/scale);
+    const mouse_y = Math.floor((event.clientY - rect.top)/scale);
+
+    id_map[mouse_y][mouse_x]=selected_item;
+    update_map[mouse_y][mouse_x]=1;
+    uptdate_screen_pixel(mouse_y,mouse_x);
+    console.log(mouse_x, mouse_y);
+
+}
+
+});
 
 canvas.addEventListener("click", (event) => {
 
@@ -162,13 +126,21 @@ canvas.addEventListener("click", (event) => {
     const mouse_x = Math.floor((event.clientX - rect.left)/scale);
     const mouse_y = Math.floor((event.clientY - rect.top)/scale);
 
-    big_map.set_pixel(selected_item,mouse_y,mouse_x);
-    big_map.show_map_canvas();
-
+    id_map[mouse_y][mouse_x]=selected_item;
+    update_map[mouse_y][mouse_x]=1;
+    uptdate_screen_pixel(mouse_y,mouse_x);
     console.log(mouse_x, mouse_y);
 
-
 });
+
+let game_paused=false;
+pause_button.addEventListener("click",(event)=>
+{
+game_paused=!game_paused;
+console.log(game_paused);
+});
+
+
 </script>
 
 

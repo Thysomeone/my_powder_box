@@ -2,52 +2,80 @@
 
 
 //map functions
-function make_id_map(map,map_max_y,map_max_x)
-{
-map=[];
-for(let j=0;j<map_max_y;j++) //basic map;
-{
-    map[j]=[];
-    for(let i=0;i<map_max_x;i++)
+function  show_map_canvas(map)
     {
-    map[j][i]=0;
+        console.log("show_map_canvas called");
+        for(let j=0;j<max_y;j++)
+        {
+
+            for(let i=0;i<max_x;i++)
+            {
+                if(map[j][i].needs_screen_uptdate)
+            {
+                ctx.fillStyle = this.map[j][i].colour;
+                ctx.fillRect(i, j, 1, 1);
+            }
+
+            }
+        }
     }
 
-}
-return map;
-}
-
-function make_pixel_map(map,map_max_y,map_max_x)
-{
-map=[];
-for(let j=0;j<map_max_y;j++) //basic map;
-{
-    map[j]=[];
-    for(let i=0;i<map_max_x;i++)
+function update_pixels(id_map,uptdate_map)
     {
-    map[j][i]=pixels[0];
+        for(let j=max_y-1;j>=0;j--)
+        {
+
+            for(let i=0;i<max_x;i++)
+            {
+
+                pixel_fall(id_map,uptdate_map,j,i);
+            }
+        }
     }
 
+function update_screen(id_map,uptdate_map)
+{
+    for(let j=max_y-1;j>=0;j--)
+        {
+
+            for(let i=0;i<max_x;i++)
+            {
+
+                if(uptdate_map[j][i]==1)
+                {
+                    ctx.fillStyle = pixels[id_map[j][i]].colour;
+                    ctx.fillRect(i,j,1,1);
+                }
+            }
+        }
 }
-return map;
+
+function uptdate_screen_pixel(p_y,p_x)
+{
+ctx.fillStyle = pixels[id_map[p_y][p_x]].colour;
+ctx.fillRect(p_x,p_y,1,1);
 }
 
 
 //pixel functions
-function pixel_fall(id_map,pixel_map,p_y,p_x)
+function pixel_fall(id_map,update_map,p_y,p_x)
 {
-    let pixel=pixel_map[p_y][p_x];
+
+    let pixel = pixels[id_map[p_y][p_x]];
+    if(pixel.weight==undefined)
+    {
+        console.log("WTF")
+    }
+    else
     if(pixel.can_fall==true)
     {
         if(p_y+1<max_y)
         {
-            if(pixel_map[p_y+1][p_x].weight < pixel.weight )//&& pixel_map[p_y+1][p_x].can_move==true)
+            if(pixels[id_map[p_y+1][p_x]].weight < pixel.weight )//&& pixel_map[p_y+1][p_x].can_move==true)
             {
-                pixel_map[p_y][p_x]=pixel_map[p_y+1][p_x];
-                pixel_map[p_y][p_x].needs_screen_uptdate=true;
-                id_map[p_y][p_x]=pixel_map[p_y+1][p_x].id;
-                pixel_map[p_y+1][p_x]=pixel;
-                pixel_map[p_y+1][p_x].needs_screen_uptdate=true;
+                update_map[p_y][p_x]=true;
+                id_map[p_y][p_x]=id_map[p_y+1][p_x];
+                update_map[p_y+1][p_x]=true;
                 id_map[p_y+1][p_x]=pixel.id;
                 return;
             }
@@ -55,13 +83,11 @@ function pixel_fall(id_map,pixel_map,p_y,p_x)
 
         if(p_y+1<max_y && p_x+1<max_x)
         {
-            if(pixel_map[p_y+1][p_x+1].weight<pixel.weight )//&& pixel_map[p_y+1][p_x+1].can_move==true)
+            if(pixels[id_map[p_y+1][p_x+1]].weight<pixel.weight )//&& pixel_map[p_y+1][p_x+1].can_move==true)
             {
-                pixel_map[p_y][p_x]=pixel_map[p_y+1][p_x+1];
-                pixel_map[p_y][p_x].needs_screen_uptdate=true;
-                id_map[p_y][p_x]=pixel_map[p_y+1][p_x+1].id;
-                pixel_map[p_y+1][p_x+1]=pixel;
-                pixel_map[p_y+1][p_x+1].needs_screen_uptdate=true;
+                update_map[p_y][p_x]=true;
+                id_map[p_y][p_x]=id_map[p_y+1][p_x+1];
+                update_map[p_y+1][p_x+1]=true;
                 id_map[p_y+1][p_x+1]=pixel.id;
                 return;
             }
@@ -69,17 +95,16 @@ function pixel_fall(id_map,pixel_map,p_y,p_x)
 
         if(p_y+1<max_y && p_x-1>=0)
         {
-            if(pixel_map[p_y+1][p_x-1].weight<pixel.weight )//&& pixel_map[p_y+1][p_x-1].can_move==true)
+            if(pixels[id_map[p_y+1][p_x-1]].weight<pixel.weight )//&& pixel_map[p_y+1][p_x-1].can_move==true)
             {
-                pixel_map[p_y][p_x]=pixel_map[p_y+1][p_x-1];
-                id_map[p_y][p_x]=pixel_map[p_y+1][p_x-1].id;
-                pixel_map[p_y][p_x].needs_screen_uptdate=true;
-                pixel_map[p_y+1][p_x-1]=pixel;
-                pixel_map[p_y+1][p_x-1].needs_screen_uptdate=true;
+                id_map[p_y][p_x]=id_map[p_y+1][p_x-1];
+                update_map[p_y][p_x]=true;
+                update_map[p_y+1][p_x-1]=true;
                 id_map[p_y+1][p_x-1]=pixel.id;
                 return;
             }
         }
 
     }
+
 }

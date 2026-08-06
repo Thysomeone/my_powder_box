@@ -15,7 +15,6 @@ class pixel
         this.weight=weight;
         this.can_fall=can_fall;
         this.can_move=can_move;
-        this.needs_screen_uptdate=true; //will be cahanged, for optimisation
     }
 }
 
@@ -31,3 +30,4 @@ let sand = new pixel(2,"#ccc205",10,true,true)
 
 //pixel list
 const pixels =[air,solid_barrier,sand];
+const added_pixel_amount = 3;
