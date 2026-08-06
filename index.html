@@ -16,12 +16,15 @@
 <div id="toolbar">
 
     <button class="toggle" id="pause" data-element-id = "-1">pause</button>
-    <button class="tool" id="air" data-element-id = "0">air</button>
+    <button class="tool" id="gas_void" data-element-id = "0">void</button>
     <button class="tool" id="barrier" data-element-id = "1">barrier</button>
-    <button class="tool" id="sand" data-element-id = "2">sand</button>
-    <button class="tool" id="water" data-element-id = "3">water</button>
+    <button class="tool" id="air" data-element-id = "2">air</button>
+    <button class="tool" id="sand" data-element-id = "3">sand</button>
+    <button class="tool" id="water" data-element-id = "4">water</button>
     
 </div>
+
+<div id="fpsCounter" style="position:fixed; top:5px; left:5px; color:#0f0; font-family:monospace; font-size:15px;z-index:100;"></div>
 
 </div>
 
@@ -34,10 +37,10 @@ const barrier_button = document.getElementById("barrier");
 const sand_button = document.getElementById("sand");
 
 //size
-const max_x=8;
-const max_y=16;
+const max_x=40;
+const max_y=80;
 
-const scale = 50;
+const scale = 10;
 
 
 const canvas = document.getElementById("canvas");
@@ -56,7 +59,7 @@ canvas.style.height = `${max_y * scale}px`;
 let current_operations=0;
 
 let id_map=[];
-initalize_map(id_map,0);
+initalize_map(id_map,2);
 
 let update_map=[];
 initalize_map(update_map,0);
@@ -65,24 +68,42 @@ initalize_map(update_map,0);
 // big_map.show_map_canvas()
 
 console.log("we're starting")
+
 //ai made, change
 const FPS = 30;
 const FRAME_TIME = 1000 / FPS;
 
 let lastUpdate = 0;
 
+// --- fps counter state ---
+let fpsCounter = 0;
+let fpsDisplay = 0;
+let fpsLastCheck = 0;
+
 function frame_manager(time) {
-    if (time - lastUpdate >= FRAME_TIME) 
+    if (time - lastUpdate >= FRAME_TIME)
     {
         lastUpdate = time;
-        if(game_paused==false)
+
+        if (game_paused == false)
+        {
+            update_pixels(id_map, update_map);
+            update_screen(id_map, update_map);
+        }
+
+        // count this as one real simulation/render tick
+        fpsCounter++;
+    }
+
+    // update the displayed number once per second
+    if (time - fpsLastCheck >= 1000)
     {
-
-        update_pixels(id_map,update_map);
-        update_screen(id_map,update_map);
+        fpsDisplay = fpsCounter;
+        fpsCounter = 0;
+        fpsLastCheck = time;
+        document.getElementById("fpsCounter").textContent = `FPS: ${fpsDisplay}`;
     }
 
-    }
     requestAnimationFrame(frame_manager);
 }
 
@@ -92,34 +113,72 @@ requestAnimationFrame(frame_manager);
 //test
 let selected_item =2; //sand
 let place=false;
+
+
+//ai made code, replace
+
 canvas.addEventListener("mousedown", (event) =>
 {
-place=true;
+    place = true;
 });
 
 canvas.addEventListener("mouseup", (event) =>
 {
-place=false;
+    place = false;
 });
 
 canvas.addEventListener("mousemove", (event) => {
+    if (place == true)
+    {
+        handle_paint(event.clientX, event.clientY);
+    }
+});
 
-    if(place==true)
+// --- touch support ---
+
+canvas.addEventListener("touchstart", (event) => {
+    event.preventDefault(); // stop scrolling/zooming while drawing
+    place = true;
+    const touch = event.touches[0];
+    handle_paint(touch.clientX, touch.clientY);
+}, { passive: false });
+
+canvas.addEventListener("touchend", (event) => {
+    event.preventDefault();
+    place = false;
+}, { passive: false });
+
+canvas.addEventListener("touchcancel", (event) => {
+    place = false;
+});
+
+canvas.addEventListener("touchmove", (event) => {
+    event.preventDefault(); // stop the page from scrolling as you drag
+    if (place == true)
+    {
+        const touch = event.touches[0];
+        handle_paint(touch.clientX, touch.clientY);
+    }
+}, { passive: false });
+
+// shared logic, so mouse and touch don't duplicate code
+function handle_paint(clientX, clientY)
 {
-
     const rect = canvas.getBoundingClientRect();
 
-    const mouse_x = Math.floor((event.clientX - rect.left)/scale);
-    const mouse_y = Math.floor((event.clientY - rect.top)/scale);
+    const mouse_x = Math.floor((clientX - rect.left) / scale);
+    const mouse_y = Math.floor((clientY - rect.top) / scale);
 
-    id_map[mouse_y][mouse_x]=selected_item;
-    update_map[mouse_y][mouse_x]=1;
-    uptdate_screen_pixel(mouse_y,mouse_x);
-    console.log(mouse_x, mouse_y);
+    // bounds check — easy to go out of range on touch
+    if (mouse_x < 0 || mouse_x >= max_x || mouse_y < 0 || mouse_y >= max_y)
+        return;
 
+    id_map[mouse_y][mouse_x] = selected_item;
+    update_map[mouse_y][mouse_x] = 1;
+    uptdate_screen_pixel(mouse_y, mouse_x);
 }
+//end of ai code
 
-});
 
 canvas.addEventListener("click", (event) => {
 

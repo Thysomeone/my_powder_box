@@ -24,13 +24,16 @@ class pixel
 //heavier pixels fall trough lighter ones
 
 //pixel variables
-let air = new pixel(0,"#8F8F8F",0,true,true,1,50)
+let gas_void = new pixel(0,"#040404c6",0,true,true,5,1)
 
 let solid_barrier = new pixel(1,"#303030",100,false,false,5,5)
 
-let sand = new pixel(2,"#ccc205",10,true,true,2,3)
+let air = new pixel(2,"#8F8F8F",2,true,true,3,1)
 
-let water = new pixel(3,"#055fcc",5,true,true,5,1)
+let sand = new pixel(3,"#ccc205",10,true,true,1,3)
+
+let water = new pixel(4,"#055fcc",5,true,true,10,1)
 //pixel list
-const pixels =[air,solid_barrier,sand,water];
-const added_pixel_amount = 3;
+const pixels =[gas_void,solid_barrier,air,sand,water];
+
+const added_pixel_amount = 5;

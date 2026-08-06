@@ -27,7 +27,6 @@ function update_pixels(id_map,uptdate_map)
 
             for(let i=0;i<max_x;i++)
             {
-
                 pixel_fall(id_map,uptdate_map,j,i);
             }
         }
