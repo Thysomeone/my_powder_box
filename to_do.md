@@ -5,10 +5,14 @@ performance goal
 30 FPS on a bad device (on a 400 by 800 map)
 
 --to do
--fix pixels teleporting to the top
-(happens when you place a light pixel under heavy ones)
 
 -more elements
+--and fix button layout
+
+-visual improvements
+
+-optimize the new additions
+--bigger map size
 
 Optional / low priority
 

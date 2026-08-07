@@ -11,4 +11,4 @@ Current features
 
 -5  pixel types
 
--40pixels by 80pixles map
+-100pixels by 160pixles map

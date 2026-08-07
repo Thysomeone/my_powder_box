@@ -28,7 +28,7 @@ let gas_void = new pixel(0,"#040404c6",0,true,true,5,1)
 
 let solid_barrier = new pixel(1,"#303030",100,false,false,5,5)
 
-let air = new pixel(2,"#8F8F8F",2,true,true,3,1)
+let air = new pixel(2,"#8F8F8F",2,true,true,5,1)
 
 let sand = new pixel(3,"#ccc205",10,true,true,1,3)
 
@@ -42,3 +42,7 @@ const added_pixel_amount = 5;
 
 const x_pitty_chance = 1;
 //how much the pitty can be before it's forced back down, for X axis
+
+const sideways_move_chance = 0.1;
+// sideways_move_chance = chance for a pixel to move sideways when falling
+// ex: 0.1 = 10%

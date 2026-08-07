@@ -22,12 +22,26 @@ function  show_map_canvas(map)
 
     }
 
+    function swap_pixels(p1_y,p1_x,p2_y,p2_x) //used to swap pixels, no bounds checking
+    {
+        pixel_update_map[p1_y][p1_x]=1;
+        pixel_update_map[p2_y][p2_x]=1;
+        let pixel_id_holder = id_map[p1_y][p1_x];
+        //not moved sideways so goes straigt down
+        update_map[p1_y][p1_x]=true;
+        id_map[p1_y][p1_x]=id_map[p2_y][p2_x];
+        update_map[p2_y][p2_x]=true;
+        id_map[p2_y][p2_x]=pixel_id_holder;
+    }
+
 function update_pixels(id_map,uptdate_map)
     {
         let x_pitty = 0;
         //pitty sistem for the checks
         //added to make it look more natural
         //and to avoid anomalies
+        initalize_map(pixel_update_map,0);
+
         for(let j=max_y-1;j>=0;j--)
         {
             let random_side = Math.random(); //checks from random side
@@ -38,7 +52,6 @@ function update_pixels(id_map,uptdate_map)
             {
                 pixel_fall(id_map,uptdate_map,j,i);
             }
-
             x_pitty--;
             //decrease pitty
             }
@@ -85,19 +98,25 @@ ctx.fillRect(p_x,p_y,1,1);
 function pixel_fall(id_map,update_map,p_y,p_x)
 {
 
+
     let pixel = pixels[id_map[p_y][p_x]];
     let max_horizontal_slide=pixel.max_horizontal_slide;
     let max_vertical_diffrence=pixel.max_vertical_diffrence;
 
-    if(pixel.can_fall==true && p_y+1<max_y) //simple fall down logic
+    let random_sideways_chance = Math.random(); //makes movement more unpredictable
+
+    //simple fall down logic
+    //fails based on random_sideways_chance to let pixels fall lef/right
+    if(pixel.can_fall==true && p_y+1<max_y && random_sideways_chance > sideways_move_chance) 
     {
+
         if(pixels[id_map[p_y+1][p_x]].weight<pixel.weight && pixels[id_map[p_y+1][p_x]].can_move)
-        {
-            update_map[p_y][p_x]=true;
-            id_map[p_y][p_x]=id_map[p_y+1][p_x];
-            update_map[p_y+1][p_x]=true;
-            id_map[p_y+1][p_x]=pixel.id;
+        {   
+            if(pixel_update_map[p_y][p_x]==0 && pixel_update_map[p_y+1][p_x]==0) //solution for double updates
+            {
+            swap_pixels(p_y,p_x,p_y+1,p_x);
             return;
+            }
         }
 
     }
@@ -109,98 +128,55 @@ function pixel_fall(id_map,update_map,p_y,p_x)
         //we check the possible end positions
         let can_go_left=true;
         let can_go_right=true;
+
+        let random_order_picker = Math.random();
+        //the folowing 2 for stateme
         for(let i=1;i<=max_horizontal_slide;i++)
         {
+            //codes for end
+            //end == 2 -> updated the pixel
+            //end == 1 -> direction stil valid, no pixel update
+            //end == 0 ->direction invalid
+            if(random_order_picker < 0.5)
+            {//right side priority
             if(p_x-i>=0 && can_go_left)//check for the right side
             {
-                let valid = true;
-                if(pixels[id_map[p_y][p_x-i]].weight<pixel.weight && pixels[id_map[p_y][p_x-i]].can_move)
-                {
-
-                    for(let j=p_y+max_vertical_diffrence; j>p_y;j--)
-                    {
-                        if(pixels[id_map[j][p_x-i]].weight<pixel.weight && pixels[id_map[j][p_x-i]].can_move)
-                        {
-
-                        }
-                        else
-                        {
-                            valid=false;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    can_go_left=false;
-                    valid=false;
-                }
-
-                if(valid)
-                {
-                    if(i==1)
-                    {
-                    update_map[p_y][p_x]=true;
-                    id_map[p_y][p_x]=id_map[p_y+1][p_x-1];
-                    update_map[p_y+1][p_x-1]=true;
-                    id_map[p_y+1][p_x-1]=pixel.id;
+                let end = 0;
+                end = right_fall_algorithm(pixel,p_y,p_x,i);
+                if(end==2)
                     return;
-                    }
-                    else
-                    {
-                    update_map[p_y][p_x]=true;
-                    id_map[p_y][p_x]=id_map[p_y][p_x-1];
-                    update_map[p_y][p_x-1]=true;
-                    id_map[p_y][p_x-1]=pixel.id;
-                    return;
-                    }
-                }
+
+                can_go_left=end;
             }
-
             if(p_x+i<max_x && can_go_right)//check for the left side
             {
-                let valid = true;
-                if(pixels[id_map[p_y][p_x+i]].weight<pixel.weight && pixels[id_map[p_y][p_x+i]].can_move)
-                {
-
-                    for(let j=p_y+max_vertical_diffrence; j>p_y;j--)
-                    {
-                        if(pixels[id_map[j][p_x+i]].weight<pixel.weight && pixels[id_map[j][p_x+i]].can_move)
-                        {
-
-                        }
-                        else
-                        {
-                            valid=false;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    can_go_right=false;
-                    valid=false;
-                }
-
-                if(valid)
-                {
-                    if(i==1)
-                    {
-                    update_map[p_y][p_x]=true;
-                    id_map[p_y][p_x]=id_map[p_y+1][p_x+1];
-                    update_map[p_y+1][p_x+1]=true;
-                    id_map[p_y+1][p_x+1]=pixel.id;
+                let end = 0;
+                end = left_fall_algorithm(pixel,p_y,p_x,i);
+                if(end==2)
                     return;
-                    }
-                    else
-                    {
-                    update_map[p_y][p_x]=true;
-                    id_map[p_y][p_x]=id_map[p_y][p_x+1];
-                    update_map[p_y][p_x+1]=true;
-                    id_map[p_y][p_x+1]=pixel.id;
+                can_go_right=end;
+            }
+            }
+            else
+            { //left side priority
+            if(p_x+i<max_x && can_go_right)//check for the left side
+            {
+                let end = 0;
+                end = left_fall_algorithm(pixel,p_y,p_x,i);
+                if(end==2)
                     return;
-                    }
-                }
+                can_go_right=end;
+            }
+            if(p_x-i>=0 && can_go_left)//check for the right side
+            {
+                let end = 0;
+                end = right_fall_algorithm(pixel,p_y,p_x,i);
+                if(end==2)
+                    return;
+
+                can_go_left=end;
+            }
+
             }
 
             if(can_go_left==false && can_go_right==false)
@@ -209,4 +185,127 @@ function pixel_fall(id_map,update_map,p_y,p_x)
     }
 
 
+    //failsafe
+    //in case pixel couldn't fall sideways
+        if(pixel.can_fall==true && p_y+1<max_y) 
+    {
+
+        if(pixels[id_map[p_y+1][p_x]].weight<pixel.weight && pixels[id_map[p_y+1][p_x]].can_move)
+        {   
+            if(pixel_update_map[p_y][p_x]==0 && pixel_update_map[p_y+1][p_x]==0) //solution for double updates
+            {
+            swap_pixels(p_y,p_x,p_y+1,p_x);
+            return;
+            }
+        }
+
+    }
+}
+
+
+//used for the fall right logic
+function right_fall_algorithm(pixel,p_y,p_x,i)
+{
+    let valid = true;
+    let max_horizontal_slide=pixel.max_horizontal_slide;
+    let max_vertical_diffrence=pixel.max_vertical_diffrence;
+
+    if(pixels[id_map[p_y][p_x-i]].weight<pixel.weight && pixels[id_map[p_y][p_x-i]].can_move)
+    {
+
+    for(let j=p_y+max_vertical_diffrence; j>p_y;j--)
+    {
+    if(pixels[id_map[j][p_x-i]].weight<pixel.weight && pixels[id_map[j][p_x-i]].can_move)
+    {
+
+    }
+    else
+    {
+    valid=false;
+    break;
+    }
+    }
+    }
+    else
+    {
+    can_go_left=false;
+    valid=false;
+    return 0;
+    }
+
+    if(valid)
+    {
+    if(i==1)
+    {
+    update_map[p_y][p_x]=true;
+    id_map[p_y][p_x]=id_map[p_y+1][p_x-1];
+    update_map[p_y+1][p_x-1]=true;
+    id_map[p_y+1][p_x-1]=pixel.id;
+    return 2;
+    }
+    else
+    {
+    update_map[p_y][p_x]=true;
+    id_map[p_y][p_x]=id_map[p_y][p_x-1];
+    update_map[p_y][p_x-1]=true;
+    id_map[p_y][p_x-1]=pixel.id;
+    return 2;
+    }
+
+    }
+
+    return 1;
+}
+
+//used for the fall left logic
+function left_fall_algorithm(pixel,p_y,p_x,i)
+{
+let valid = true;
+let max_horizontal_slide=pixel.max_horizontal_slide;
+let max_vertical_diffrence=pixel.max_vertical_diffrence;
+
+if(pixels[id_map[p_y][p_x+i]].weight<pixel.weight && pixels[id_map[p_y][p_x+i]].can_move)
+    {
+
+    for(let j=p_y+max_vertical_diffrence; j>p_y;j--)
+    {
+        if(pixels[id_map[j][p_x+i]].weight<pixel.weight && pixels[id_map[j][p_x+i]].can_move)
+        {
+
+        }
+        else
+        {
+        valid=false;
+        break;
+        }
+    }
+    }
+    else
+    {
+        can_go_right=false;
+        valid=false;
+        return 0;
+    }
+
+    if(valid)
+    {
+    if(i==1)
+    {
+    update_map[p_y][p_x]=true;
+    id_map[p_y][p_x]=id_map[p_y+1][p_x+1];
+    update_map[p_y+1][p_x+1]=true;
+    id_map[p_y+1][p_x+1]=pixel.id;
+    return 2;
+    }
+    else
+    {
+    update_map[p_y][p_x]=true;
+    id_map[p_y][p_x]=id_map[p_y][p_x+1];
+    update_map[p_y][p_x+1]=true;
+    id_map[p_y][p_x+1]=pixel.id;
+    return 2;
+    }
+    }
+
+    return 1;
 }

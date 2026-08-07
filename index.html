@@ -64,9 +64,16 @@ canvas.style.height = `${max_y * scale}px`;
 
 let current_operations=0;
 
+//the map that contains the id of pixels
+//(replaced pixel_map for preformance reasons)
 let id_map=[];
 initalize_map(id_map,2);
 
+//used to keep track of what pixels were updated
+let pixel_update_map=[];
+initalize_map(pixel_update_map,0);
+
+//used to uptdate what the screen shows
 let update_map=[];
 initalize_map(update_map,0);
 
@@ -117,7 +124,7 @@ requestAnimationFrame(frame_manager);
 
 
 //test
-let selected_item =2; //sand
+let selected_item =3; //sand
 let place=false;
 
 
