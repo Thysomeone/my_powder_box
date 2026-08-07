@@ -32,9 +32,11 @@ let air = new pixel(2,"#8F8F8F",2,true,true,3,1)
 
 let sand = new pixel(3,"#ccc205",10,true,true,1,3)
 
-let water = new pixel(4,"#055fcc",5,true,true,10,1)
+let water = new pixel(4,"#055fcc",5,true,true,25,1)
+
+let wood = new pixel(5,"#553600",25,false,true,0,0)
 //pixel list
-const pixels =[gas_void,solid_barrier,air,sand,water];
+const pixels =[gas_void,solid_barrier,air,sand,water,wood];
 
 const added_pixel_amount = 5;
 

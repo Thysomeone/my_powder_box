@@ -12,6 +12,26 @@
 
     }
 
+    //used for adding pixels
+    function change_pixles(mouse_y,mouse_x,brush_size)
+    {
+        for(let j=Math.max(mouse_y-brush_size,0);j<mouse_y+brush_size && j<max_y;j++)
+    {
+        for(let i = Math.max(mouse_x-brush_size,0);i<mouse_x+brush_size && i<max_x;i++)
+    {
+        id_map[j][i]=selected_item;
+        update_map[j][i]=1;
+
+        //planed for removal
+        uptdate_screen_pixel(j,i);
+    }
+
+    }
+    //update the map
+    console.log(mouse_x, mouse_y);
+    }
+
+
 
     //used for debug
     function set_pixel(map,element,pixel_y,pixel_x)

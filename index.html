@@ -21,7 +21,13 @@
     <button class="tool" id="air" data-element-id = "2">air</button>
     <button class="tool" id="sand" data-element-id = "3">sand</button>
     <button class="tool" id="water" data-element-id = "4">water</button>
+    <button class="tool" id="wood" data-element-id = "5">wood</button>
     
+</div>
+
+<div id="toolbar">
+    <button class="setting" id="increase_brush_size" data-value = "1">+</button>
+    <button class="setting" id="decrease_brush_size" data-value = "-1">-</button>
 </div>
 
 <div id="fpsCounter" style="position:fixed; top:5px; left:5px; color:#0f0; font-family:monospace; font-size:15px;z-index:100;"></div>
@@ -37,10 +43,10 @@ const barrier_button = document.getElementById("barrier");
 const sand_button = document.getElementById("sand");
 
 //size
-const max_x=40;
-const max_y=80;
+const max_x=100;
+const max_y=160;
 
-const scale = 10;
+const scale = 5;
 
 
 const canvas = document.getElementById("canvas");
@@ -173,9 +179,7 @@ function handle_paint(clientX, clientY)
     if (mouse_x < 0 || mouse_x >= max_x || mouse_y < 0 || mouse_y >= max_y)
         return;
 
-    id_map[mouse_y][mouse_x] = selected_item;
-    update_map[mouse_y][mouse_x] = 1;
-    uptdate_screen_pixel(mouse_y, mouse_x);
+    change_pixles(mouse_y,mouse_x,brush_size);
 }
 //end of ai code
 
@@ -187,10 +191,7 @@ canvas.addEventListener("click", (event) => {
     const mouse_x = Math.floor((event.clientX - rect.left)/scale);
     const mouse_y = Math.floor((event.clientY - rect.top)/scale);
 
-    id_map[mouse_y][mouse_x]=selected_item;
-    update_map[mouse_y][mouse_x]=1;
-    uptdate_screen_pixel(mouse_y,mouse_x);
-    console.log(mouse_x, mouse_y);
+    change_pixles(mouse_y,mouse_x,brush_size);
 
 });
 
@@ -208,6 +209,23 @@ buttons.forEach(btn => {
   btn.addEventListener("click", function() {
     console.log("Selected tool:", btn.dataset.elementId);
     selected_item=parseFloat(btn.dataset.elementId);
+  });
+});
+
+const setting_buttons = document.querySelectorAll(".setting");
+
+
+
+//the brush size selector
+let brush_size=3;
+setting_buttons.forEach(btn => {
+  btn.addEventListener("click", function() {
+    brush_size=brush_size + parseFloat(btn.dataset.value);
+    if(brush_size<1)
+  {
+    brush_size=1;
+  }
+    console.log("b_size", brush_size);
   });
 });
 
