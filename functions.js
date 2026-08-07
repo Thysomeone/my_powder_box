@@ -50,7 +50,16 @@ function update_pixels(id_map,uptdate_map)
             {
             for(let i=0;i<max_x;i++)
             {
+                if(region_map[Math.trunc(j/region_map_scale)][Math.trunc(i/region_map_scale)])
+                {
+                //update only when needed
                 pixel_fall(id_map,uptdate_map,j,i);
+                }
+                else
+                {
+                i=Math.trunc(i/region_map_scale+1)*region_map_scale; //we move to the next "cell"
+                i--; //acounts for the i++;
+                }
             }
             x_pitty--;
             //decrease pitty
@@ -60,7 +69,16 @@ function update_pixels(id_map,uptdate_map)
             {
                 for(let i=max_x-1;i>=0;i--)
             {
+                if(region_map[Math.trunc(j/region_map_scale)][Math.trunc(i/region_map_scale)])
+                {
+                //update only when needed
                 pixel_fall(id_map,uptdate_map,j,i);
+                }
+                else
+                {
+                i=Math.trunc(i/region_map_scale-1)*region_map_scale; //we move to the next "cell"
+                i++; //acounts for the i--;
+                }
             }
 
             x_pitty++; //increase pitty
@@ -77,11 +95,19 @@ function update_screen(id_map,uptdate_map)
 
             for(let i=0;i<max_x;i++)
             {
-
+                if(region_map[Math.trunc(j/region_map_scale)][Math.trunc(i/region_map_scale)])
+                {
+                //update only when needed
                 if(uptdate_map[j][i]==1)
                 {
                     ctx.fillStyle = pixels[id_map[j][i]].colour;
                     ctx.fillRect(i,j,1,1);
+                }
+                }
+                else
+                {
+                i=Math.trunc(i/region_map_scale+1)*region_map_scale; //we move to the next "cell"
+                i--; //acounts for the i++;
                 }
             }
         }
@@ -97,7 +123,9 @@ ctx.fillRect(p_x,p_y,1,1);
 //pixel functions
 function pixel_fall(id_map,update_map,p_y,p_x)
 {
-
+        //we do this
+        //update_region_map(p_y,p_x);
+        //only when changing pixels
 
     let pixel = pixels[id_map[p_y][p_x]];
     let max_horizontal_slide=pixel.max_horizontal_slide;
@@ -115,6 +143,8 @@ function pixel_fall(id_map,update_map,p_y,p_x)
             if(pixel_update_map[p_y][p_x]==0 && pixel_update_map[p_y+1][p_x]==0) //solution for double updates
             {
             swap_pixels(p_y,p_x,p_y+1,p_x);
+            if( region_map[Math.trunc(p_y/region_map_scale)][Math.trunc(p_x/region_map_scale)]<2) //temporary fix;
+            update_region_map(p_y,p_x);
             return;
             }
         }
@@ -138,13 +168,17 @@ function pixel_fall(id_map,update_map,p_y,p_x)
             //end == 1 -> direction stil valid, no pixel update
             //end == 0 ->direction invalid
             if(random_order_picker < 0.5)
-            {//right side priority
-            if(p_x-i>=0 && can_go_left)//check for the right side
+            {//left side priority
+            if(p_x-i>=0 && can_go_left)//check for the left side
             {
                 let end = 0;
                 end = right_fall_algorithm(pixel,p_y,p_x,i);
                 if(end==2)
+                {
+                    if( region_map[Math.trunc(p_y/region_map_scale)][Math.trunc(p_x/region_map_scale)]<2) //temporary fix;
+                    update_region_map(p_y,p_x);
                     return;
+                }
 
                 can_go_left=end;
             }
@@ -153,18 +187,26 @@ function pixel_fall(id_map,update_map,p_y,p_x)
                 let end = 0;
                 end = left_fall_algorithm(pixel,p_y,p_x,i);
                 if(end==2)
+                {
+                    if( region_map[Math.trunc(p_y/region_map_scale)][Math.trunc(p_x/region_map_scale)]<2) //temporary fix;
+                    update_region_map(p_y,p_x);
                     return;
+                }
                 can_go_right=end;
             }
             }
             else
-            { //left side priority
-            if(p_x+i<max_x && can_go_right)//check for the left side
+            { //right side priority
+            if(p_x+i<max_x && can_go_right)//check for the right side
             {
                 let end = 0;
                 end = left_fall_algorithm(pixel,p_y,p_x,i);
                 if(end==2)
+                {
+                    if( region_map[Math.trunc(p_y/region_map_scale)][Math.trunc(p_x/region_map_scale)]<2) //temporary fix;
+                    update_region_map(p_y,p_x);
                     return;
+                }
                 can_go_right=end;
             }
             if(p_x-i>=0 && can_go_left)//check for the right side
@@ -172,8 +214,11 @@ function pixel_fall(id_map,update_map,p_y,p_x)
                 let end = 0;
                 end = right_fall_algorithm(pixel,p_y,p_x,i);
                 if(end==2)
+                {
+                    if( region_map[Math.trunc(p_y/region_map_scale)][Math.trunc(p_x/region_map_scale)]<2) //temporary fix;
+                    update_region_map(p_y,p_x);
                     return;
-
+                }
                 can_go_left=end;
             }
 
@@ -194,13 +239,17 @@ function pixel_fall(id_map,update_map,p_y,p_x)
         {   
             if(pixel_update_map[p_y][p_x]==0 && pixel_update_map[p_y+1][p_x]==0) //solution for double updates
             {
+            if(region_map[Math.trunc(p_y/region_map_scale)][Math.trunc(p_x/region_map_scale)]<2) //temporary fix;
+            update_region_map(p_y,p_x);
             swap_pixels(p_y,p_x,p_y+1,p_x);
             return;
             }
         }
 
     }
+
 }
+
 
 
 //used for the fall right logic
@@ -308,4 +357,76 @@ if(pixels[id_map[p_y][p_x+i]].weight<pixel.weight && pixels[id_map[p_y][p_x+i]].
     }
 
     return 1;
+}
+
+//activates the region map cells
+//and their neighbours
+//diagonals count
+//Math.trunc guarantees int's
+//notation
+// 3 = just updated
+// 1 = updated 2 tick ago
+// 0 = can ignore
+const region_map_value = 3;
+//neighbour cells recive a value of region_map_value-1;
+function update_region_map(p_y,p_x) //has bounds checking
+{
+    region_map[Math.trunc(p_y/region_map_scale)][Math.trunc(p_x/region_map_scale)] = region_map_value;
+
+    if(Math.trunc(p_x/region_map_scale-1)>=0)
+    {
+        region_map[Math.trunc(p_y/region_map_scale)][Math.trunc(p_x/region_map_scale-1)] = region_map_value-1;
+    }
+
+    if(Math.trunc(p_x/region_map_scale+1)<Math.trunc(max_x/region_map_scale))
+    {
+        region_map[Math.trunc(p_y/region_map_scale)][Math.trunc(p_x/region_map_scale+1)] = region_map_value-1;
+    }
+
+    if(Math.trunc(p_y/region_map_scale-1)>=0)
+    {
+        region_map[Math.trunc(p_y/region_map_scale-1)][Math.trunc(p_x/region_map_scale)]
+
+        if(Math.trunc(p_x/region_map_scale-1)>=0)
+        {
+            region_map[Math.trunc(p_y/region_map_scale-1)][Math.trunc(p_x/region_map_scale-1)] = region_map_value-1;
+        }
+
+        if(Math.trunc(p_x/region_map_scale+1)<Math.trunc(max_x/region_map_scale))
+        {
+            region_map[Math.trunc(p_y/region_map_scale-1)][Math.trunc(p_x/region_map_scale+1)] = region_map_value-1;
+        }
+
+    }
+
+        if(Math.trunc(p_y/region_map_scale+1)<Math.trunc(max_y/region_map_scale))
+    {
+        region_map[Math.trunc(p_y/region_map_scale+1)][Math.trunc(p_x/region_map_scale)] = region_map_value-1;
+
+        if(Math.trunc(p_x/region_map_scale-1)>=0)
+        {
+            region_map[Math.trunc(p_y/region_map_scale+1)][Math.trunc(p_x/region_map_scale-1)] = region_map_value-1;
+        }
+
+        if(Math.trunc(p_x/region_map_scale+1)<Math.trunc(max_x/region_map_scale))
+        {
+            region_map[Math.trunc(p_y/region_map_scale+1)][Math.trunc(p_x/region_map_scale+1)] = region_map_value-1;
+        }
+    }
+}
+
+function clean_region_map(region_map)// deactivates cells;
+{
+    for(let j = 0; j<max_y/region_map_scale ; j++)
+    {
+
+        for(let i = 0; i<max_x/region_map_scale ; i++)
+        {
+
+            if(region_map[j][i] > 0)
+            {
+                region_map[j][i]--;
+            }
+        }
+    }
 }

@@ -77,6 +77,10 @@ initalize_map(pixel_update_map,0);
 let update_map=[];
 initalize_map(update_map,0);
 
+const region_map_scale = 10;
+let region_map = []; //splits the game in regions for efficency
+initalize_map_custom_size(region_map,2,max_y/region_map_scale,max_x/region_map_scale)
+
 // big_map.show_map_all()
 // big_map.show_map_canvas()
 
@@ -102,6 +106,8 @@ function frame_manager(time) {
         {
             update_pixels(id_map, update_map);
             update_screen(id_map, update_map);
+            clean_region_map(region_map);
+            //show_map_all(region_map,max_y/region_map_scale);
         }
 
         // count this as one real simulation/render tick

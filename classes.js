@@ -24,15 +24,15 @@ class pixel
 //heavier pixels fall trough lighter ones
 
 //pixel variables
-let gas_void = new pixel(0,"#040404c6",0,true,true,5,1)
+let gas_void = new pixel(0,"#040404",0,true,true,5,1)
 
 let solid_barrier = new pixel(1,"#303030",100,false,false,5,5)
 
-let air = new pixel(2,"#8F8F8F",2,true,true,5,1)
+let air = new pixel(2,"#8F8F8F",2,true,true,4,1)
 
 let sand = new pixel(3,"#ccc205",10,true,true,1,3)
 
-let water = new pixel(4,"#055fcc",5,true,true,25,1)
+let water = new pixel(4,"#055fcc",5,true,true,20,1)
 
 let wood = new pixel(5,"#553600",25,false,true,0,0)
 //pixel list
