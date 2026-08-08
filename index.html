@@ -48,9 +48,18 @@ const max_y=160;
 
 const scale = 5;
 
+//start elem
+const start_elem_id=0;
 
+//how we show stuff
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+
+canvas.width = max_x;
+canvas.height = max_y;
+//
+const imageData = ctx.createImageData(max_x, max_y);
+const data = imageData.data;
 
 canvas.width = max_x;
 canvas.height = max_y;
@@ -58,8 +67,17 @@ canvas.height = max_y;
 canvas.style.width = `${max_x * scale}px`;
 canvas.style.height = `${max_y * scale}px`;
 
-// ctx.fillStyle = "red"
-// ctx.fillRect(1, 1, 1, 1);  
+// fill with a gradient, just to see it work
+for (let y = 0; y < max_y; y++) {
+  for (let x = 0; x < max_x; x++) {
+    const i = (y * max_x + x) * 4;
+    data[i]     =pixels[start_elem_id].colour[0];  // R
+    data[i + 1] =pixels[start_elem_id].colour[1]// G
+    data[i + 2] =pixels[start_elem_id].colour[2]// B
+    data[i + 3] = 255;                // A (fully opaque)
+  }
+}
+
 
 
 let current_operations=0;
@@ -67,23 +85,23 @@ let current_operations=0;
 //the map that contains the id of pixels
 //(replaced pixel_map for preformance reasons)
 let id_map=[];
-initalize_map(id_map,2);
+initalize_map(id_map,start_elem_id);
 
 //used to keep track of what pixels were updated
 let pixel_update_map=[];
 initalize_map(pixel_update_map,0);
 
-//used to uptdate what the screen shows
-let update_map=[];
-initalize_map(update_map,0);
 
-const region_map_scale = 10;
+
 let region_map = []; //splits the game in regions for efficency
+const region_map_scale = 10;
+const region_max_y = Math.trunc(max_y/region_map_scale) //max_p_y converted for region
+const region_max_x = Math.trunc(max_x/region_map_scale) //max_p_x converted for region
 initalize_map_custom_size(region_map,2,max_y/region_map_scale,max_x/region_map_scale)
 
-// big_map.show_map_all()
-// big_map.show_map_canvas()
 
+
+ctx.putImageData(imageData, 0, 0);
 console.log("we're starting")
 
 //ai made, change
@@ -104,11 +122,14 @@ function frame_manager(time) {
 
         if (game_paused == false)
         {
-            update_pixels(id_map, update_map);
-            update_screen(id_map, update_map);
+            update_pixels(id_map);
             clean_region_map(region_map);
-            //show_map_all(region_map,max_y/region_map_scale);
         }
+
+        //screen gets updated once per frame
+        //we always do it so we dot put screen updates
+        //in the functions that handle input
+        update_screen();
 
         // count this as one real simulation/render tick
         fpsCounter++;
@@ -201,10 +222,7 @@ canvas.addEventListener("click", (event) => {
 
     const rect = canvas.getBoundingClientRect();
 
-    const mouse_x = Math.floor((event.clientX - rect.left)/scale);
-    const mouse_y = Math.floor((event.clientY - rect.top)/scale);
-
-    change_pixles(mouse_y,mouse_x,brush_size);
+    handle_paint(event.clientX,event.clientY)
 
 });
 
@@ -230,7 +248,7 @@ const setting_buttons = document.querySelectorAll(".setting");
 
 
 //the brush size selector
-let brush_size=3;
+let brush_size=5;
 setting_buttons.forEach(btn => {
   btn.addEventListener("click", function() {
     brush_size=brush_size + parseFloat(btn.dataset.value);

@@ -34,10 +34,7 @@
         for(let i = Math.max(mouse_x-brush_size,0);i<mouse_x+brush_size && i<max_x;i++)
     {
         id_map[j][i]=selected_item;
-        update_map[j][i]=1;
-
-        //planed for removal
-        uptdate_screen_pixel(j,i);
+        update_image_data(j,i);
     }
 
     }
@@ -55,6 +52,7 @@
         }
     }
     }
+
     //update the map
     console.log(mouse_x, mouse_y);
     }
@@ -78,4 +76,13 @@
         console.log("map");
         for(let j=0;j<max_j;j++)
             console.table(map[j]);
+    }
+
+    function update_image_data(p_y,p_x)
+    {
+        let data_i = (p_y * max_x + p_x) * 4
+        data[data_i]=pixels[id_map[p_y][p_x]].colour[0];
+        data[data_i+1]=pixels[id_map[p_y][p_x]].colour[1];
+        data[data_i+2]=pixels[id_map[p_y][p_x]].colour[2];
+        data[data_i+3]=255;
     }
