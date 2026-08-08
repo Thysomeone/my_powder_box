@@ -36,17 +36,14 @@
 
 </body>
 <script>
-
 const pause_button = document.getElementById("pause");
-const air_button = document.getElementById("air");
-const barrier_button = document.getElementById("barrier");
-const sand_button = document.getElementById("sand");
 
 //size
-const max_x=100;
-const max_y=160;
+//PC preset
+const max_x=500;
+const max_y=250;
 
-const scale = 5;
+const scale = 3;
 
 //start elem
 const start_elem_id=0;
@@ -95,10 +92,12 @@ initalize_map(pixel_update_map,0);
 
 let region_map = []; //splits the game in regions for efficency
 const region_map_scale = 10;
+const region_map_value = 5; //value of a newly updated region
 const region_max_y = Math.trunc(max_y/region_map_scale) //max_p_y converted for region
 const region_max_x = Math.trunc(max_x/region_map_scale) //max_p_x converted for region
 initalize_map_custom_size(region_map,2,max_y/region_map_scale,max_x/region_map_scale)
-
+//start brush size
+let brush_size=10;
 
 
 ctx.putImageData(imageData, 0, 0);
@@ -123,13 +122,24 @@ function frame_manager(time) {
         if (game_paused == false)
         {
             update_pixels(id_map);
-            clean_region_map(region_map);
         }
 
         //screen gets updated once per frame
         //we always do it so we dot put screen updates
         //in the functions that handle input
         update_screen();
+
+        //cleanup operaions are done last
+        if(game_paused==false)
+        {
+            clean_region_map(region_map);
+        }
+
+        //placing new stuff
+        if(place==true)
+        {
+            handle_paint(mouse_x,mouse_y)
+        }
 
         // count this as one real simulation/render tick
         fpsCounter++;
@@ -152,13 +162,17 @@ requestAnimationFrame(frame_manager);
 
 //test
 let selected_item =3; //sand
+
 let place=false;
 
-
+let mouse_x = 0;
+let mouse_y = 0;
 //ai made code, replace
 
 canvas.addEventListener("mousedown", (event) =>
 {
+    mouse_x=event.clientX;
+    mouse_y=event.clientY;
     place = true;
 });
 
@@ -167,20 +181,22 @@ canvas.addEventListener("mouseup", (event) =>
     place = false;
 });
 
-canvas.addEventListener("mousemove", (event) => {
-    if (place == true)
-    {
-        handle_paint(event.clientX, event.clientY);
-    }
-});
+canvas.addEventListener("mousemove",(event)=>
+{
+    if(place==true)
+{
+    mouse_x=event.clientX;
+    mouse_y=event.clientY;
+}
+
+}
+)
 
 // --- touch support ---
 
 canvas.addEventListener("touchstart", (event) => {
     event.preventDefault(); // stop scrolling/zooming while drawing
     place = true;
-    const touch = event.touches[0];
-    handle_paint(touch.clientX, touch.clientY);
 }, { passive: false });
 
 canvas.addEventListener("touchend", (event) => {
@@ -197,7 +213,9 @@ canvas.addEventListener("touchmove", (event) => {
     if (place == true)
     {
         const touch = event.touches[0];
-        handle_paint(touch.clientX, touch.clientY);
+        mouse_x=touch.clientX;
+        mouse_y=touch.clientY
+        
     }
 }, { passive: false });
 
@@ -226,6 +244,8 @@ canvas.addEventListener("click", (event) => {
 
 });
 
+
+
 let game_paused=false;
 pause_button.addEventListener("click",(event)=>
 {
@@ -248,7 +268,6 @@ const setting_buttons = document.querySelectorAll(".setting");
 
 
 //the brush size selector
-let brush_size=5;
 setting_buttons.forEach(btn => {
   btn.addEventListener("click", function() {
     brush_size=brush_size + parseFloat(btn.dataset.value);

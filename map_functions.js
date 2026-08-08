@@ -43,13 +43,7 @@
     {
         for(let i = Math.trunc(Math.max(mouse_x-brush_size,0)/region_map_scale);i<mouse_x+brush_size && i<max_x;i=i+region_map_scale)
     {
-        if(region_map[Math.trunc(j/region_map_scale)][Math.trunc(i/region_map_scale)]>=2)
-        {// >=2 beacuse if it's 1 it needs an update, if it's 2 it'll get checked anyway
-        } 
-        else
-        {
         update_region_map(j,i);
-        }
     }
     }
 
